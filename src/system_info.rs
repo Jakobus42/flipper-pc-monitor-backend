@@ -23,6 +23,7 @@ pub struct SystemInfo {
     pub ram_usage: u8,
     pub ram_unit: [u8; 4],
     pub gpu_usage: u8,
+    pub gpu_temp: u8,
     pub vram_max: u16,
     pub vram_usage: u8,
     pub vram_unit: [u8; 4],
@@ -87,6 +88,13 @@ impl SystemInfo {
                 Some(gi) => gi.gpu_usage as u8,
                 None => u8::MAX,
             },
+            gpu_temp: match &gpu_info {
+                Some(gi) => {
+                    println!("gpu_temp: {}", gi.gpu_temp);
+                    gi.gpu_temp as u8
+                }
+                None => u8::MAX,
+            },
             vram_max: (vram_max as f64 / u64::pow(base, vram_exp) as f64 * 10.0) as u16,
             vram_usage: match &gpu_info {
                 Some(gi) => {
@@ -102,6 +110,7 @@ impl SystemInfo {
 #[derive(Serialize, Debug, Clone)]
 pub struct GpuInfo {
     pub gpu_usage: u64,
+    pub gpu_temp: u64,
     pub vram_max: u64,
     pub vram_used: u64,
 }
@@ -132,6 +141,9 @@ impl GpuInfo {
                 let Some(gpu_usage) = nvd_r2u64(g["utilization"]["gpu_util"].to_string()) else {
                     return None;
                 };
+                let Some(gpu_temp) = nvd_r2u64(g["temperature"]["gpu_temp"].to_string()) else {
+                    return None;
+                };
                 let Some(vram_max) = nvd_r2u64(g["fb_memory_usage"]["total"].to_string()) else {
                     return None;
                 };
@@ -141,6 +153,7 @@ impl GpuInfo {
 
                 Some(GpuInfo {
                     gpu_usage,
+                    gpu_temp,
                     vram_max,
                     vram_used,
                 })
