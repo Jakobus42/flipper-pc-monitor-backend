@@ -89,10 +89,7 @@ impl SystemInfo {
                 None => u8::MAX,
             },
             gpu_temp: match &gpu_info {
-                Some(gi) => {
-                    println!("gpu_temp: {}", gi.gpu_temp);
-                    gi.gpu_temp as u8
-                }
+                Some(gi) => gi.gpu_temp as u8,
                 None => u8::MAX,
             },
             vram_max: (vram_max as f64 / u64::pow(base, vram_exp) as f64 * 10.0) as u16,
